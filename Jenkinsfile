@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'kartikeyadimri/calculator-devops'
-        DOCKER_TAG = '1.0'
         DOCKER_CREDENTIALS = 'dockerhub-creds'
     }
 
@@ -43,7 +42,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+                sh 'docker build -t "$DOCKER_IMAGE:$BUILD_NUMBER" .'
             }
         }
 
@@ -59,7 +58,7 @@ pipeline {
                     sh '''
                         echo "$DOCKER_PASSWORD" | docker login \
                             -u "$DOCKER_USER" --password-stdin
-                        docker push "$DOCKER_IMAGE:$DOCKER_TAG"
+                        docker push "$DOCKER_IMAGE:$BUILD_NUMBER"
                         docker logout
                     '''
                 }
@@ -80,12 +79,13 @@ pipeline {
                 subject: "SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}",
                 body: """The Jenkins pipeline completed successfully.
 
-                Job: ${JOB_NAME}
-                Build Number: ${BUILD_NUMBER}
-                Build URL: ${BUILD_URL}
-                Status: SUCCESS
-                """
-                )
+Job: ${JOB_NAME}
+Build Number: ${BUILD_NUMBER}
+Build URL: ${BUILD_URL}
+Docker Image: ${DOCKER_IMAGE}:${BUILD_NUMBER}
+Status: SUCCESS
+"""
+            )
         }
 
         failure {
@@ -94,14 +94,18 @@ pipeline {
                 subject: "FAILURE: ${JOB_NAME} #${BUILD_NUMBER}",
                 body: """The Jenkins pipeline failed.
 
-                Job: ${JOB_NAME}
-                Build Number: ${BUILD_NUMBER}
-                Build URL: ${BUILD_URL}
-                Status: FAILURE
+Job: ${JOB_NAME}
+Build Number: ${BUILD_NUMBER}
+Build URL: ${BUILD_URL}
+Status: FAILURE
 
-                Please check the Console Output for details.
-                """
-                )
+Please check the Console Output for details.
+"""
+            )
+        }
+
+        always {
+            echo 'Calculator CI/CD pipeline finished.'
         }
     }
 }
