@@ -24,6 +24,9 @@ pipeline {
         }
 
         stage('Test') {
+            tools {
+                maven 'Maven'
+            }
             steps {
                 sh 'mvn test'
             }
