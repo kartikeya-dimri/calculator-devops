@@ -103,9 +103,5 @@ pipeline {
                 """
                 )
         }
-
-        always {
-            echo 'Calculator CI/CD pipeline finished.'
-        }
     }
 }
