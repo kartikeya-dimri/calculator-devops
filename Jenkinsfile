@@ -69,11 +69,35 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            emailext(
+                to: 'YOUR_EMAIL@example.com',
+                subject: "SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}",
+                body: """The Jenkins pipeline completed successfully.
+
+                Job: ${JOB_NAME}
+                Build Number: ${BUILD_NUMBER}
+                Build URL: ${BUILD_URL}
+                Status: SUCCESS
+                """
+                )
         }
+
         failure {
-            echo 'Pipeline failed. Check the Console Output.'
+            emailext(
+                to: 'YOUR_EMAIL@example.com',
+                subject: "FAILURE: ${JOB_NAME} #${BUILD_NUMBER}",
+                body: """The Jenkins pipeline failed.
+
+                Job: ${JOB_NAME}
+                Build Number: ${BUILD_NUMBER}
+                Build URL: ${BUILD_URL}
+                Status: FAILURE
+
+                Please check the Console Output for details.
+                """
+                )
         }
+
         always {
             echo 'Calculator CI/CD pipeline finished.'
         }
