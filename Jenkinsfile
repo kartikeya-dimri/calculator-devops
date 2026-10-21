@@ -70,7 +70,7 @@ pipeline {
     post {
         success {
             emailext(
-                to: 'YOUR_EMAIL@example.com',
+                to: '${env.NOTIFICATION_EMAIL}',
                 subject: "SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}",
                 body: """The Jenkins pipeline completed successfully.
 
@@ -84,7 +84,7 @@ pipeline {
 
         failure {
             emailext(
-                to: 'YOUR_EMAIL@example.com',
+                to: '${env.NOTIFICATION_EMAIL}',
                 subject: "FAILURE: ${JOB_NAME} #${BUILD_NUMBER}",
                 body: """The Jenkins pipeline failed.
 
