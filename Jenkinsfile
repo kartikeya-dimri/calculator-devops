@@ -16,15 +16,19 @@ pipeline {
 
         stage('Build') {
             tools {
+                jdk 'JDK21'
                 maven 'Maven'
             }
             steps {
+                sh 'java -version'
+                sh 'mvn -version'
                 sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Test') {
             tools {
+                jdk 'JDK21'
                 maven 'Maven'
             }
             steps {
