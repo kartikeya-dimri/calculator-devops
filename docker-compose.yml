@@ -1,0 +1,7 @@
+services:
+  calculator:
+    image: "${DOCKER_IMAGE}:${DOCKER_TAG}"
+    container_name: calculator
+    stdin_open: true
+    tty: true
+    restart: "no"
