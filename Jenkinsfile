@@ -1,5 +1,7 @@
+
 pipeline {
     agent any
+
     options {
         timestamps()
         disableConcurrentBuilds()
@@ -74,33 +76,31 @@ pipeline {
                 sh 'echo "Notification email configured: ${NOTIFICATION_EMAIL:+YES}"'
             }
         }
-    }
 
+        stage('Deploy') {
+            steps {
+                sh '''
+                    export DOCKER_TAG="$BUILD_NUMBER"
 
-    stage('Deploy') {
-        steps {
-            sh '''
-                export DOCKER_TAG="$BUILD_NUMBER"
+                    docker compose config
+                    docker compose pull calculator
+                    docker compose up -d --no-build calculator
+                    docker compose ps calculator
 
-                docker compose config
-                docker compose pull calculator
-                docker compose up -d --no-build calculator
-                docker compose ps calculator
+                    status=$(docker inspect \
+                        --format='{{.State.Status}}' calculator)
 
-                status=$(docker inspect \
-                    --format='{{.State.Status}}' calculator)
+                    if [ "$status" != "running" ]; then
+                        echo "Deployment failed: calculator status is $status"
+                        docker logs calculator
+                        exit 1
+                    fi
 
-                if [ "$status" != "running" ]; then
-                    echo "Deployment failed: calculator status is $status"
-                    docker logs calculator
-                    exit 1
-                fi
-
-                echo "Calculator container is running."
-            '''
+                    echo "Calculator container is running."
+                '''
+            }
         }
     }
-
 
     post {
         success {
